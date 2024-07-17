@@ -58,6 +58,23 @@ public class ConsumerKafkaConfig {
         props.put(
                 JsonDeserializer.TRUSTED_PACKAGES,
                 "*");
+        //Quantidade de mensagens que a aplicação busca no kafka
+        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 10);
+
+        //Aplicação busca as mensagens mais recentes do momento que subiu
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+
+        //Aplicação busca as mensagens das mais antigas até atual, que estão no kafka
+        //props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+
+        //Quanto a permissão de criação dos tópicos, se app pode ou não criar automaticamente
+        props.put(
+                ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG, false);
+
+        //Quanto ao commit da mensagem para outros grupos quando a mesma já foi processada
+        //por um consumidor
+        //props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
