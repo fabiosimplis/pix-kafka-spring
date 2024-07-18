@@ -44,7 +44,7 @@ public class PixValidator {
 
         if (origem == null || destino == null) {
             pix.setStatus(PixStatus.ERRO);
-            throw new KeyNotFoundException();
+            //throw new KeyNotFoundException("ERROR - Origem: "+ origem +", Destino: "+ destino );
         } else {
             pix.setStatus(PixStatus.PROCESSADO);
         }
