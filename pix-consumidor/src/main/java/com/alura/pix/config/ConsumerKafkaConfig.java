@@ -1,6 +1,8 @@
 package com.alura.pix.config;
 
 import com.alura.pix.dto.PixDTO;
+import io.confluent.kafka.serializers.KafkaAvroDeserializer;
+import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -24,7 +26,7 @@ public class ConsumerKafkaConfig {
 
     @Bean
     public ProducerFactory<String, PixDTO> producerFactory() {
-        Map<String, Object> configProps = new HashMap<>();
+        Map configProps = new HashMap();
         configProps.put(
                 ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
                 bootstrapAddress);
@@ -34,18 +36,18 @@ public class ConsumerKafkaConfig {
         configProps.put(
                 ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
                 JsonSerializer.class);
-        return new DefaultKafkaProducerFactory<>(configProps);
+        return new DefaultKafkaProducerFactory(configProps);
     }
 
     @Bean
     public KafkaTemplate<String, PixDTO> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
+        return new KafkaTemplate<String, PixDTO>(producerFactory());
     }
 
 
     @Bean
     public ConsumerFactory<String, PixDTO> consumerFactory() {
-        Map<String, Object> props = new HashMap<>();
+        Map<String, Object> props = new HashMap();
         props.put(
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
                 bootstrapAddress);
@@ -54,7 +56,12 @@ public class ConsumerKafkaConfig {
                 StringDeserializer.class);
         props.put(
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-                JsonDeserializer.class);
+                KafkaAvroDeserializer.class);
+        props.put("schema.registry.url",
+                "http://localhost:9092");
+        props.put(
+                KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG,
+                true);
         props.put(
                 JsonDeserializer.TRUSTED_PACKAGES,
                 "*");
@@ -75,7 +82,7 @@ public class ConsumerKafkaConfig {
         //por um consumidor
         //props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
 
-        return new DefaultKafkaConsumerFactory<>(props);
+        return new DefaultKafkaConsumerFactory(props);
     }
 
     @Bean
@@ -83,7 +90,7 @@ public class ConsumerKafkaConfig {
         kafkaListenerContainerFactory() {
 
         ConcurrentKafkaListenerContainerFactory<String, PixDTO> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
+                new ConcurrentKafkaListenerContainerFactory();
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }
